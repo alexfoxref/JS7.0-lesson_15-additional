@@ -1,5 +1,6 @@
 require('nodelist-foreach-polyfill');
 require('formdata-polyfill');
+require('smoothscroll-polyfill');
 
 window.addEventListener('DOMContentLoaded', () => {
 
