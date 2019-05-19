@@ -1574,23 +1574,53 @@ function calc() {
       daysSum = +restDays.value,
       total = 0;
   totalValue.innerHTML = 0;
-  persons.addEventListener('change', function () {
-    personsSum = +this.value;
-    total = (daysSum + personsSum) * 4000;
 
-    if (restDays.value == '' || persons.value == '') {
-      totalValue.innerHTML = 0;
-    } else {
-      var totalStr = total * place.options[place.selectedIndex].value + '';
-      animatedNum(totalStr, totalValue);
-    }
-  }); // анимация цифр
+  function getOneNum(str) {
+    return new _Promise(function (resolve) {
+      if (index < str.length) {
+        if (count <= +str[index]) {
+          resolve(str);
+        } else {
+          index++;
+          index < str.length ? count = 0 : count = '';
+          resolve(str);
+        }
+      } else {
+        index = 0;
+        count = 0;
+      }
+    });
+  } // анимация цифр
 
-  function animatedNum(str, element) {
+
+  var animatedNum = function animatedNum(str, element) {
     var index = 0,
         count = 0;
 
-    function getNum(str) {
+    var getOneNum = function getOneNum(str) {
+      return new _Promise(function (resolve) {
+        if (index < str.length) {
+          if (count <= +str[index]) {
+            resolve(str);
+          } else {
+            index++;
+            index < str.length ? count = 0 : count = '';
+            resolve(str);
+          }
+        } else {
+          index = 0;
+          count = 0;
+        }
+      });
+    };
+
+    var waitTimeout = function waitTimeout(ms) {
+      return new _Promise(function (resolve) {
+        setTimeout(resolve, ms);
+      });
+    };
+
+    var getNum = function getNum(str) {
       getOneNum(str).then(function (res) {
         if (index == 0) {
           element.textContent = count;
@@ -1603,61 +1633,40 @@ function calc() {
         waitTimeout(20).then(function () {
           getNum(str);
         });
-      }); // .catch((err) => console.log(err))
-    }
-
-    function getOneNum(str) {
-      return new _Promise(function (resolve, reject) {
-        if (index < str.length) {
-          if (count <= +str[index]) {
-            resolve(str);
-          } else {
-            index++;
-            index < str.length ? count = 0 : count = '';
-            resolve(str);
-          }
-        } else {
-          // reject('конец числа');
-          index = 0;
-          count = 0;
-        }
       });
-    }
-
-    function waitTimeout(ms) {
-      return new _Promise(function (resolve) {
-        setTimeout(resolve, ms);
-      });
-    }
+    };
 
     getNum(str);
-  }
+  };
 
-  restDays.addEventListener('change', function () {
-    daysSum = +this.value;
-    total = (daysSum + personsSum) * 4000;
+  document.body.addEventListener('change', function (e) {
+    if (e.target && e.target.classList.contains('counter-block-input')) {
+      daysSum = +e.target.value;
+      total = (daysSum + personsSum) * 4000;
 
-    if (persons.value == '' || restDays.value == '') {
-      totalValue.innerHTML = 0;
-    } else {
-      var totalStr = total * place.options[place.selectedIndex].value + '';
-      animatedNum(totalStr, totalValue);
+      if (persons.value == '' || restDays.value == '') {
+        totalValue.innerHTML = 0;
+      } else {
+        var totalStr = total * place.options[place.selectedIndex].value + '';
+        animatedNum(totalStr, totalValue);
+      }
+    }
+
+    if (e.target && e.target == place) {
+      if (restDays.value == '' || persons.value == '') {
+        totalValue.innerHTML = 0;
+      } else {
+        var a = total,
+            _totalStr = a * e.target.options[e.target.selectedIndex].value + '';
+
+        animatedNum(_totalStr, totalValue);
+      }
     }
   });
-  place.addEventListener('change', function () {
-    if (restDays.value == '' || persons.value == '') {
-      totalValue.innerHTML = 0;
-    } else {
-      var a = total,
-          totalStr = a * this.options[this.selectedIndex].value + '';
-      animatedNum(totalStr, totalValue);
+  document.body.addEventListener('input', function (e) {
+    if (e.target && e.target.classList.contains('counter-block-input')) {
+      e.target.value = e.target.value.replace(/[\D]|^0/g, '');
     }
-  });
-  persons.addEventListener('input', function () {
-    this.value = this.value.replace(/[\D]|^0/g, '');
-  });
-  restDays.addEventListener('input', function () {
-    this.value = this.value.replace(/[\D]|^0/g, '');
   });
 }
 
@@ -1683,12 +1692,10 @@ function form() {
       statusMessage = document.createElement('div'),
       overlayForm = document.querySelector('.overlay-form'),
       popupFormTitle = document.querySelector('.popup-form-title'),
-      overlay = document.querySelector('.overlay'),
-      popup = document.querySelector('.overlay > *'),
       popupFormStatus = document.querySelector('.popup-form-status');
   statusMessage.classList.add('status-img');
 
-  function sendForm(form, input) {
+  var sendForm = function sendForm(form, input) {
     //объект стандартных интерпретаций ответа сервера
     var message = {
       loading: 'Загрузка...',
@@ -1700,8 +1707,8 @@ function form() {
       failureImg: "<img src=\"src/img/delete-button.svg\" width=\"40\" height=\"40\" alt=\"\u0427\u0442\u043E-\u0442\u043E \u043F\u043E\u0448\u043B\u043E \u043D\u0435 \u0442\u0430\u043A...\">",
       failureImgBig: "<img src=\"src/img/delete-button.svg\" width=\"200\" height=\"200\" alt=\"\u0427\u0442\u043E-\u0442\u043E \u043F\u043E\u0448\u043B\u043E \u043D\u0435 \u0442\u0430\u043A...\">"
     };
-    form.addEventListener('submit', function (event) {
-      event.preventDefault(); //добавляем картинку в форму и удаляем класс анимации всплывающего окна формы
+    form.addEventListener('submit', function (e) {
+      e.preventDefault(); //добавляем картинку в форму и удаляем класс анимации всплывающего окна формы
 
       form.appendChild(statusMessage);
       overlayForm.classList.remove('fade-form'); //устанавливаем позицию для картинки
@@ -1712,44 +1719,10 @@ function form() {
       } else {
         statusMessage.style.top = '58%';
         statusMessage.style.left = '54%';
-      } //формируем запрос в формате json
+      } //загрузка
 
 
-      function postData(data) {
-        return new _Promise(function (resolve, reject) {
-          var request = new XMLHttpRequest();
-          request.open('POST', 'server.php');
-          request.setRequestHeader('Content-Type', 'application/json; charset=utf-8'); //слушатель на начало загрузки
-
-          request.addEventListener('loadstart', function () {
-            loadingPost();
-          }); //слушатель на изменение состояния запроса
-
-          request.addEventListener('readystatechange', function () {
-            // так не работает
-            // if (request.readyState < 4) {
-            //     resolve('loading')} else 
-            if (request.readyState === 4) {
-              if (request.status == 200) {
-                resolve('success');
-              } else {
-                reject('failure');
-              }
-            }
-          });
-          request.send(data);
-        });
-      } //создаем данные в формате json
-
-
-      var formData = new FormData(form),
-          obj = {};
-      formData.forEach(function (value, key) {
-        obj[key] = value;
-      });
-      var json = JSON.stringify(obj); //загрузка
-
-      function loadingPost() {
+      var loadingPost = function loadingPost() {
         //класс для условия остановки анимации
         statusMessage.classList.add('loading');
         statusMessage.innerHTML = message.loadingImg; //js анимация вращения картинки
@@ -1763,42 +1736,81 @@ function form() {
             clearInterval(loadingAnimation);
           }
         }, 10);
-      } //функция действий при успехе и при неуспехе
+      }; //формируем запрос в формате json
 
 
-      function requestEvent(st) {
-        //класс для условия остановки анимации
+      var postData = function postData(data) {
+        return new _Promise(function (resolve, reject) {
+          var request = new XMLHttpRequest();
+          request.open('POST', 'server.php');
+          request.setRequestHeader('Content-Type', 'application/json; charset=utf-8'); //слушатель на начало загрузки
+
+          request.addEventListener('loadstart', function () {
+            loadingPost();
+          }); //слушатель на изменение состояния запроса
+
+          request.addEventListener('readystatechange', function () {
+            if (request.readyState === 4) {
+              if (request.status == 200) {
+                resolve('success');
+              } else {
+                reject('failure');
+              }
+            }
+          });
+          request.send(data);
+        });
+      }; //создаем данные в формате json
+
+
+      var formData = new FormData(form),
+          obj = {};
+      formData.forEach(function (value, key) {
+        obj[key] = value;
+      });
+      var json = JSON.stringify(obj); //функция действий при успехе и при неуспехе
+
+      var requestEvent = function requestEvent(st) {
+        var bindModal = function bindModal(displayStatus, overlayMethod, popupMethod, overflowStatus) {
+          overlayForm.style.display = displayStatus;
+          overlayForm.classList[overlayMethod]('fade-form');
+          popupFormStatus[popupMethod](image);
+          document.body.style.overflow = overflowStatus;
+        }; //класс для условия остановки анимации
+
+
         statusMessage.classList.remove('loading'); //вставляем нужную картинку
 
         statusMessage.innerHTML = message["".concat(st, "Img")]; //модальное окно с нужной надписью и картинкой
 
-        overlayForm.style.display = 'block';
-        overlayForm.classList.add('fade-form');
         popupFormTitle.textContent = message["".concat(st)];
         var image = document.createElement('div');
         image.innerHTML = message["".concat(st, "ImgBig")];
         image.classList.add('popup-form-img');
-        popupFormStatus.appendChild(image); //закрываем модальное окно по клику в любое место и убираем обработчик событий
+        bindModal('block', 'add', 'appendChild', 'hidden'); //закрываем модальное окно по клику в любое место и убираем обработчик событий
 
-        function removeListener(event) {
-          overlayForm.style.display = 'none';
-          overlayForm.classList.remove('fade-form');
-          popupFormStatus.removeChild(image);
+        var removeListener = function removeListener() {
+          bindModal('none', 'remove', 'removeChild', '');
           document.body.removeEventListener('click', removeListener);
-        }
+
+          if (form.contains(statusMessage)) {
+            statusMessage.innerHTML = '';
+            form.removeChild(statusMessage);
+          }
+        };
 
         document.body.addEventListener('click', removeListener);
-      } //setTimeout
+      }; //setTimeout
 
 
-      function waitTimeout(ms) {
+      var waitTimeout = function waitTimeout(ms) {
         return new _Promise(function (resolve) {
           setTimeout(resolve, ms);
         });
-      } //окончание запроса
+      }; //окончание запроса
 
 
-      function endPost() {
+      var endPost = function endPost() {
         for (var i = 0; i < input.length; i++) {
           input[i].value = '';
           input[i].addEventListener('input', function () {
@@ -1808,39 +1820,25 @@ function form() {
             }
           });
         }
-      }
+      };
 
-      postData(json) // так не работает
-      // .then(() => {
-      //     loadingPost()
-      // })
-      .then(function (succ) {
+      postData(json).then(function (succ) {
         waitTimeout(1000).then(function () {
-          requestEvent('success');
+          requestEvent(succ);
         });
       }).catch(function (err) {
         waitTimeout(3000).then(function () {
-          requestEvent('failure');
+          requestEvent(err);
           console.error('Сервер не отвечает');
         });
       }).then(function () {
         endPost();
       });
     });
-  }
+  };
 
   sendForm(form, input);
-  sendForm(contactForm, contactInput); // скрываем модальное окно при нажатии в область вне окна
-
-  overlay.addEventListener('click', function (event) {
-    if (event.target && !popup.contains(event.target)) {
-      //удаляем сообщение блока ajax
-      if (form.contains(statusMessage)) {
-        statusMessage.innerHTML = '';
-        form.removeChild(statusMessage);
-      }
-    }
-  });
+  sendForm(contactForm, contactInput);
 }
 
 module.exports = form;
@@ -1857,15 +1855,15 @@ module.exports = form;
 //Ограничение ввода в поля телефон
 function input() {
   var siteInputs = document.querySelectorAll('input[name="phone"]');
-  document.addEventListener('input', function (event) {
+  document.body.addEventListener('input', function (e) {
     siteInputs.forEach(function (item) {
-      if (event.target && event.target == item) {
+      if (e.target && e.target == item) {
         //формируем ввод
         item.value = '+' + item.value.replace(/[^\d]/g, "").replace(/\d{12,}/, "".concat(item.value.replace(/[^\d]/g, "").slice(0, 11))); //удаляем плюс
 
-        item.addEventListener('keydown', function (event) {
-          if (event.keyCode == 8 && item.value == '+') {
-            event.preventDefault();
+        item.addEventListener('keydown', function (e) {
+          if (e.keyCode == 8 && item.value == '+') {
+            e.preventDefault();
             item.value = '';
           }
         }); //выводим рекомендацию ...
@@ -1900,22 +1898,17 @@ module.exports = input;
 
 // Плавная прокрутка пунктов меню
 function lightScroll() {
-  var menuPanel = document.querySelector('ul'),
-      menuItems = document.querySelectorAll('li > a'),
-      overlay = document.querySelector('.overlay');
+  var menuItems = document.querySelectorAll('li > a');
   menuItems.forEach(function (item) {
     item.classList.add('menu-item');
   });
-  menuPanel.addEventListener('click', function (event) {
-    event.preventDefault(); //чтобы прокрутка не работала при открытом модальном окне
-
-    if (!overlay.classList.contains('activeOverlay')) {
-      if (event.target && event.target.classList.contains('menu-item')) {
-        document.querySelector(event.target.getAttribute('href')).scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }
+  document.body.addEventListener('click', function (e) {
+    if (e.target && e.target.classList.contains('menu-item')) {
+      e.preventDefault();
+      document.querySelector(e.target.getAttribute('href')).scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
     }
   });
 }
@@ -1933,123 +1926,89 @@ module.exports = lightScroll;
 
 // Модальные окна
 function modal() {
-  var more = document.querySelector('.more'),
-      close = document.querySelector('.popup-close'),
-      popup = document.querySelector('.overlay > *'),
-      tabBtns = document.querySelectorAll('.description-btn'),
-      fade = document.querySelectorAll('.fade')[8];
-  overlay = document.querySelector('.overlay');
-  document.body.addEventListener('click', function (event) {
-    var _loop = function _loop(i) {
-      if (event.target && (event.target == more || event.target == tabBtns[i])) {
-        event.preventDefault(); //удаляем любую анимацию по-умолчанию
+  var popup = document.querySelector('.overlay > *'),
+      fade = document.querySelectorAll('.fade')[8],
+      overlay = document.querySelector('.overlay'),
+      isActiveBtn;
 
-        more.classList.remove('more-splash');
-        tabBtns[i].classList.remove('more-splash');
-        fade.classList.remove('fade');
+  var bindModal = function bindModal(displayStatus, overflowStatus, el) {
+    if (displayStatus == 'block') {
+      isActiveBtn = el;
+    }
 
-        if (/Msie|Edge/i.test(navigator.userAgent)) {
-          //добавляем css анимацию
-          more.classList.add('more-splash');
-          tabBtns[i].classList.add('more-splash');
-          fade.classList.add('fade');
-        } else if (!/Msie|Edge|Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
-          //добавляем js анимацию
-          //начальное положение
-          overlay.style.top = '50%';
-          overlay.style.left = '50%';
-          overlay.style.width = '0%';
-          overlay.style.height = '0%';
-          popup.style.left = '-50%';
-          var shadow = 10;
+    ;
 
-          if (event.target == more) {
-            more.style.boxShadow = "0 0 ".concat(shadow, "px #c78030");
-          }
+    if (!el) {
+      el = isActiveBtn;
+    }
 
-          if (event.target == tabBtns[i]) {
-            tabBtns[i].style.boxShadow = "0 0 ".concat(shadow, "px #c78030");
-          } //js анимация
+    ;
+    el.classList.remove('more-splash');
+    overlay.style.display = displayStatus;
+    document.body.style.overflow = overflowStatus;
+  };
 
+  document.body.addEventListener('click', function (e) {
+    if (e.target && (e.target.classList.contains('more') || e.target.classList.contains('description-btn'))) {
+      //удаляем любую анимацию по-умолчанию
+      bindModal('block', 'hidden', e.target);
+      fade.classList.remove('fade');
 
-          function overlayAnimation(pos1, pos2, int) {
-            var id = setInterval(frameOverlay, int);
+      if (/Msie|Edge/i.test(navigator.userAgent)) {
+        //добавляем css анимацию
+        e.target.classList.add('more-splash');
+        fade.classList.add('fade');
+      } else if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
+        return;
+      } else {
+        //добавляем js анимацию
+        //начальное положение
+        overlay.style.top = '50%';
+        overlay.style.left = '50%';
+        overlay.style.width = '0%';
+        overlay.style.height = '0%';
+        popup.style.left = '-50%';
+        var shadow = 0;
+        e.target.style.boxShadow = "0 0 ".concat(shadow, "px #c78030"); //js анимация
 
-            function frameOverlay() {
-              var plus = 1;
-              overlay.style.top = "".concat(parseInt(overlay.style.top) - plus, "%");
-              overlay.style.left = "".concat(parseInt(overlay.style.left) - plus, "%");
-              overlay.style.width = "".concat(parseInt(overlay.style.width) + 2 * plus, "%");
-              overlay.style.height = "".concat(parseInt(overlay.style.height) + 2 * plus, "%");
+        var overlayAnimation = function overlayAnimation(pos1, pos2, int) {
+          var frameOverlay = function frameOverlay() {
+            var plus = 1;
+            overlay.style.top = "".concat(parseInt(overlay.style.top) - plus, "%");
+            overlay.style.left = "".concat(parseInt(overlay.style.left) - plus, "%");
+            overlay.style.width = "".concat(parseInt(overlay.style.width) + 2 * plus, "%");
+            overlay.style.height = "".concat(parseInt(overlay.style.height) + 2 * plus, "%");
+            e.target.style.boxShadow = "0 0 ".concat(++shadow, "px #c78030");
 
-              if (event.target == more) {
-                more.style.boxShadow = "0 0 ".concat(++shadow, "px #c78030");
-              }
+            if (parseInt(overlay.style.top) <= pos1) {
+              clearInterval(id);
 
-              if (event.target == tabBtns[i]) {
-                tabBtns[i].style.boxShadow = "0 0 ".concat(++shadow, "px #c78030");
-              }
+              var framePopup = function framePopup() {
+                var plus = 1;
+                popup.style.left = "".concat(parseInt(popup.style.left) + 2 * plus, "%");
 
-              if (parseInt(overlay.style.top) <= pos1) {
-                clearInterval(id);
-                id = setInterval(framePopup, int);
-
-                function framePopup() {
-                  var plus = 1;
-                  popup.style.left = "".concat(parseInt(popup.style.left) + 2 * plus, "%");
-
-                  if (parseInt(popup.style.left) >= pos2) {
-                    clearInterval(id);
-
-                    if (event.target == more) {
-                      shadow = 0;
-                      more.style.boxShadow = "0 0 ".concat(shadow, "px #c78030");
-                    }
-
-                    if (event.target == tabBtns[i]) {
-                      shadow = 0;
-                      tabBtns[i].style.boxShadow = "0 0 ".concat(shadow, "px #c78030");
-                    }
-                  }
+                if (parseInt(popup.style.left) >= pos2) {
+                  clearInterval(id);
+                  shadow = 0;
+                  e.target.style.boxShadow = "0 0 ".concat(shadow, "px #c78030");
                 }
-              }
+              };
+
+              id = setInterval(framePopup, int);
             }
-          }
+          };
 
-          if (event.target == more) {
-            overlayAnimation(3, 44, 20);
-          }
+          var id = setInterval(frameOverlay, int);
+        };
 
-          if (event.target == tabBtns[i]) {
-            overlayAnimation(0, 50, 5);
-            shadow = 10;
-            tabBtns[i].style.boxShadow = "0 0 ".concat(shadow, "px #c78030");
-          }
-        }
-
-        overlay.style.display = 'block';
-        document.body.style.overflow = 'hidden'; //класс для запрещения прокрутки при открытом модальном окне
-
-        overlay.classList.add('activeOverlay');
+        overlayAnimation(0, 50, 5);
       }
-    };
-
-    for (var i = 0; i < tabBtns.length; i++) {
-      _loop(i);
-    }
-  }); // скрываем при нажатии на крестик
-
-  close.addEventListener('click', function () {
-    overlay.style.display = 'none';
-    more.classList.remove('more-splash');
-
-    for (var i = 0; i < tabBtns.length; i++) {
-      tabBtns[i].classList.remove('more-splash');
     }
 
-    document.body.style.overflow = '';
-    overlay.classList.remove('activeOverlay');
-    popup.querySelector('input').placeholder = 'Ваш телефон';
+    if (e.target && e.target.classList.contains('popup-close')) {
+      bindModal('none', '');
+      popup.querySelector('input').placeholder = 'Ваш телефон';
+    }
   });
 }
 
@@ -2073,10 +2032,8 @@ function slider() {
       dotsWrap = document.querySelector('.slider-dots'),
       dots = document.querySelectorAll('.dot'),
       wrap = document.querySelector('.wrap');
-  wrap.style.height = slides[slideIndex - 1].getBoundingClientRect().height;
-  showSlides(slideIndex);
 
-  function showSlides(n) {
+  var showSlides = function showSlides(n) {
     if (n > slides.length) {
       slideIndex = 1;
     }
@@ -2094,29 +2051,35 @@ function slider() {
       item.classList.remove('dot-active');
     });
     dots[slideIndex - 1].classList.add('dot-active');
-  }
+  };
 
-  function plusSlides(n) {
+  var plusSlides = function plusSlides(n) {
     showSlides(slideIndex += n);
-  }
+  };
 
-  function currentSlide(n) {
+  var currentSlide = function currentSlide(n) {
     showSlides(slideIndex = n);
-  }
+  };
 
-  prev.addEventListener('click', function () {
-    plusSlides(-1);
-  });
-  next.addEventListener('click', function () {
-    plusSlides(1);
-  });
-  dotsWrap.addEventListener('click', function (event) {
+  document.body.addEventListener('click', function (e) {
+    if (e.target && e.target.classList.contains('prev') || e.target.classList.contains('arrow-left')) {
+      plusSlides(-1);
+    }
+
+    ;
+
+    if (e.target && e.target.classList.contains('next') || e.target.classList.contains('arrow-right')) {
+      plusSlides(1);
+    }
+
+    ;
     dots.forEach(function (item, index) {
-      if (event.target && event.target == item) {
+      if (e.target && e.target == item) {
         currentSlide(index + 1);
       }
     });
   });
+  showSlides(slideIndex);
 }
 
 module.exports = slider;
@@ -2136,24 +2099,24 @@ function tabs() {
       info = document.querySelector('.info-header'),
       tabContent = document.querySelectorAll('.info-tabcontent');
 
-  function hideTabContent(a) {
+  var hideTabContent = function hideTabContent(a) {
     for (var i = a; i < tabContent.length; i++) {
       tabContent[i].classList.remove('show');
       tabContent[i].classList.add('hide');
     }
-  }
+  };
 
   hideTabContent(1);
 
-  function showTabContent(b) {
+  var showTabContent = function showTabContent(b) {
     if (tabContent[b].classList.contains('hide')) {
       tabContent[b].classList.remove('hide');
       tabContent[b].classList.add('show');
     }
-  }
+  };
 
-  info.addEventListener('click', function (event) {
-    var target = event.target;
+  info.addEventListener('click', function (e) {
+    var target = e.target;
 
     if (target && target.classList.contains('info-header-tab')) {
       for (var i = 0; i < tab.length; i++) {
@@ -2183,7 +2146,7 @@ function timer() {
   // Задали дату окончания
   var deadline = '2019-06-10'; // Определяем сколько осталось часов, минут и секнд до даты
 
-  function getTimeRemaining(endtime) {
+  var getTimeRemaining = function getTimeRemaining(endtime) {
     var t = Date.parse(endtime) - Date.parse(new Date());
 
     if (t > 0) {
@@ -2207,18 +2170,17 @@ function timer() {
         'seconds': '0'
       };
     }
-  } // Задаем часы
+  }; // Задаем часы
 
 
-  function setClock(id, endtime) {
+  var setClock = function setClock(id, endtime) {
     var timer = document.getElementById(id),
         days = timer.querySelector('.days'),
         hours = timer.querySelector('.hours'),
         minutes = timer.querySelector('.minutes'),
-        seconds = timer.querySelector('.seconds'),
-        timeInterval = setInterval(updateClock, 1000);
+        seconds = timer.querySelector('.seconds');
 
-    function updateClock() {
+    var updateClock = function updateClock() {
       var t = getTimeRemaining(endtime);
 
       for (var key in t) {
@@ -2249,8 +2211,10 @@ function timer() {
       if (t.total <= 0) {
         clearInterval(timeInterval);
       }
-    }
-  }
+    };
+
+    var timeInterval = setInterval(updateClock, 1000);
+  };
 
   setClock('timer', deadline);
 }
