@@ -1948,6 +1948,20 @@ function modal() {
     document.body.style.overflow = overflowStatus;
   };
 
+  var shadow = 0;
+
+  var bindHover = function bindHover(event, hoverWidth) {
+    document.body.addEventListener(event, function (e) {
+      if (e.target && (e.target.classList.contains('more') || e.target.classList.contains('description-btn'))) {
+        e.preventDefault();
+        shadow = hoverWidth;
+        e.target.style.boxShadow = "0 0 ".concat(shadow, "px #c78030");
+      }
+    });
+  };
+
+  bindHover('mouseover', 10);
+  bindHover('mouseout', 0);
   document.body.addEventListener('click', function (e) {
     if (e.target && (e.target.classList.contains('more') || e.target.classList.contains('description-btn'))) {
       //удаляем любую анимацию по-умолчанию
@@ -1968,8 +1982,7 @@ function modal() {
         overlay.style.width = '0%';
         overlay.style.height = '0%';
         popup.style.left = '-50%';
-        var shadow = 0;
-        e.target.style.boxShadow = "0 0 ".concat(shadow, "px #c78030"); //js анимация
+        e.target.style.boxShadow = "0 0 ".concat(10 + shadow, "px #c78030"); //js анимация
 
         var overlayAnimation = function overlayAnimation(pos1, pos2, int) {
           var frameOverlay = function frameOverlay() {
@@ -1978,7 +1991,7 @@ function modal() {
             overlay.style.left = "".concat(parseInt(overlay.style.left) - plus, "%");
             overlay.style.width = "".concat(parseInt(overlay.style.width) + 2 * plus, "%");
             overlay.style.height = "".concat(parseInt(overlay.style.height) + 2 * plus, "%");
-            e.target.style.boxShadow = "0 0 ".concat(++shadow, "px #c78030");
+            e.target.style.boxShadow = "0 0 ".concat(10 + ++shadow, "px #c78030");
 
             if (parseInt(overlay.style.top) <= pos1) {
               clearInterval(id);

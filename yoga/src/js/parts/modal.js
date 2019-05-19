@@ -13,10 +13,24 @@ function modal() {
         el.classList.remove('more-splash');
         overlay.style.display = displayStatus;
         document.body.style.overflow = overflowStatus;
-    }
+    };
+
+    let shadow = 0;
+    let bindHover = (event, hoverWidth) => {
+        document.body.addEventListener(event, e => {
+            if (e.target && (e.target.classList.contains('more') || e.target.classList.contains('description-btn'))) {
+                e.preventDefault();
+                shadow = hoverWidth;
+                e.target.style.boxShadow = `0 0 ${shadow}px #c78030`;
+            }
+        });
+    };
+
+    bindHover('mouseover', 10);
+    bindHover('mouseout', 0);
 
     document.body.addEventListener('click', e => {
-            
+
         if (e.target && (e.target.classList.contains('more') || e.target.classList.contains('description-btn'))) {
             //удаляем любую анимацию по-умолчанию
             bindModal('block', 'hidden', e.target);
@@ -36,9 +50,7 @@ function modal() {
                 overlay.style.width = '0%';
                 overlay.style.height = '0%';
                 popup.style.left = '-50%';
-                
-                let shadow = 0;
-                e.target.style.boxShadow = `0 0 ${shadow}px #c78030`;
+                e.target.style.boxShadow = `0 0 ${10 + shadow}px #c78030`;
 
                 //js анимация
                 let overlayAnimation = (pos1, pos2, int) => {
@@ -49,7 +61,7 @@ function modal() {
                         overlay.style.left = `${parseInt(overlay.style.left) - plus}%`;
                         overlay.style.width = `${parseInt(overlay.style.width) + 2 * plus}%`;
                         overlay.style.height = `${parseInt(overlay.style.height) + 2 * plus}%`;
-                        e.target.style.boxShadow = `0 0 ${++shadow}px #c78030`;
+                        e.target.style.boxShadow = `0 0 ${(10 + ++shadow)}px #c78030`;
 
                         if (parseInt(overlay.style.top) <= pos1) {
                             clearInterval(id);
