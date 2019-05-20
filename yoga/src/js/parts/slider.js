@@ -1,13 +1,9 @@
 // Адаптивный js Slider
 
-function slider() {
+let slider = () => {
     let slideIndex = 1,
         slides = document.querySelectorAll('.slider-item'),
-        prev = document.querySelector('.prev'),
-        next = document.querySelector('.next'),
-        dotsWrap = document.querySelector('.slider-dots'),
-        dots = document.querySelectorAll('.dot'),
-        wrap = document.querySelector('.wrap');
+        dots = document.querySelectorAll('.dot');
 
     let showSlides = n => {
         if (n > slides.length) {
@@ -36,14 +32,14 @@ function slider() {
     }
 
     document.body.addEventListener('click', e => {
-        if (e.target && e.target.classList.contains('prev') || e.target.classList.contains('arrow-left')) {
+        if (e.target.classList.contains('prev') || e.target.classList.contains('arrow-left')) {
             plusSlides(-1);
         };
-        if (e.target && e.target.classList.contains('next') || e.target.classList.contains('arrow-right')) {
+        if (e.target.classList.contains('next') || e.target.classList.contains('arrow-right')) {
             plusSlides(1);
         };
         dots.forEach((item, index) => {
-            if (e.target && e.target == item) {
+            if (e.target == item) {
                 currentSlide(index + 1);
             }
         });

@@ -1,6 +1,6 @@
 // Timer
 
-function timer() {
+let timer = () => {
     // Задали дату окончания
     let deadline = '2019-06-10';
 

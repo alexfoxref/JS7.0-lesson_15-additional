@@ -1,6 +1,6 @@
 // Модальные окна
 
-function modal() {
+let modal = () => {
     let popup = document.querySelector('.overlay > *'),
         fade = document.querySelectorAll('.fade')[8],
         overlay = document.querySelector('.overlay'),
@@ -15,23 +15,23 @@ function modal() {
         document.body.style.overflow = overflowStatus;
     };
 
+    //делаем ховер на кнопках "узнать подробнее" с помощью js, т.к. он пропадает после js анимации
     let shadow = 0;
     let bindHover = (event, hoverWidth) => {
         document.body.addEventListener(event, e => {
-            if (e.target && (e.target.classList.contains('more') || e.target.classList.contains('description-btn'))) {
+            if (e.target.classList.contains('more') || e.target.classList.contains('description-btn')) {
                 e.preventDefault();
                 shadow = hoverWidth;
                 e.target.style.boxShadow = `0 0 ${shadow}px #c78030`;
             }
         });
     };
-
     bindHover('mouseover', 10);
     bindHover('mouseout', 0);
 
     document.body.addEventListener('click', e => {
 
-        if (e.target && (e.target.classList.contains('more') || e.target.classList.contains('description-btn'))) {
+        if (e.target.classList.contains('more') || e.target.classList.contains('description-btn')) {
             //удаляем любую анимацию по-умолчанию
             bindModal('block', 'hidden', e.target);
             fade.classList.remove('fade');
@@ -86,7 +86,7 @@ function modal() {
             }
         }
 
-        if (e.target && e.target.classList.contains('popup-close')) {
+        if (e.target.classList.contains('popup-close')) {
             bindModal('none', '');
             popup.querySelector('input').placeholder = 'Ваш телефон';
         }

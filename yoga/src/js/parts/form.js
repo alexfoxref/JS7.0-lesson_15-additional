@@ -1,6 +1,6 @@
 // Формы AJAX
 
-function form() {
+let form = () => {
     let form = document.querySelector('.main-form'),
         contactForm = document.getElementById('form'),
         input = form.getElementsByTagName('input'),

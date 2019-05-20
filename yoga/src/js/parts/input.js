@@ -1,11 +1,11 @@
 //Ограничение ввода в поля телефон
 
-function input() {
+let input = () => {
     let siteInputs = document.querySelectorAll('input[name="phone"]');
 
     document.body.addEventListener('input', e => {
         siteInputs.forEach((item) => {
-            if (e.target && e.target == item) {
+            if (e.target == item) {
                 //формируем ввод
                 item.value = '+' + item.value
                     .replace(/[^\d]/g, ``)

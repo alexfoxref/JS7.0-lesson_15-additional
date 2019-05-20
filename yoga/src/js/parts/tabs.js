@@ -1,6 +1,6 @@
 // Tabs
 
-function tabs() {
+let tabs = () => {
     let tab = document.querySelectorAll('.info-header-tab'),
         info = document.querySelector('.info-header'),
         tabContent = document.querySelectorAll('.info-tabcontent');
@@ -21,12 +21,10 @@ function tabs() {
         }
     }
     
-    info.addEventListener('click', e => {
-        let target = e.target;
-    
-        if (target && target.classList.contains('info-header-tab')) {
+    info.addEventListener('click', e => {    
+        if (e.target.classList.contains('info-header-tab')) {
             for (let i = 0; i < tab.length; i++) {
-                if (target == tab[i]) {
+                if (e.target == tab[i]) {
                     hideTabContent(0);
                     showTabContent(i);
                     break;

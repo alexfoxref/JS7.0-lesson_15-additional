@@ -1,32 +1,15 @@
 // Calc
 
-function calc() {
+let calc = () => {
     let persons = document.querySelectorAll('.counter-block-input')[0],
         restDays = document.querySelectorAll('.counter-block-input')[1],
         place = document.getElementById('select'),
         totalValue = document.getElementById('total'),
-        personsSum = +persons.value,
-        daysSum = +restDays.value,
+        personsSum,
+        daysSum,
         total = 0;
 
     totalValue.innerHTML = 0;
-
- function getOneNum(str) {
-            return new Promise(resolve => {
-                if (index < str.length) {
-                    if (count <= +str[index]) {
-                        resolve(str);
-                    } else {
-                        index++;
-                        (index < str.length) ? count = 0 : count = ''
-                        resolve(str);
-                    }
-                } else {
-                    index = 0;
-                    count = 0;
-                }
-            })
-        }
 
     // анимация цифр
     let animatedNum = (str, element) => {
@@ -78,8 +61,9 @@ function calc() {
     }
 
     document.body.addEventListener('change', e => {
-        if (e.target && e.target.classList.contains('counter-block-input')) {
-            daysSum = +e.target.value;
+        if (e.target.classList.contains('counter-block-input')) {
+            personsSum = +persons.value;
+            daysSum = +restDays.value;
 
             total = (daysSum + personsSum) * 4000;
 
@@ -91,7 +75,7 @@ function calc() {
                 animatedNum(totalStr, totalValue);
             }
         }
-        if (e.target && e.target == place) {
+        if (e.target == place) {
             if (restDays.value == '' || persons.value == '') {
                 totalValue.innerHTML = 0;
             } else {
@@ -104,7 +88,7 @@ function calc() {
     });
 
     document.body.addEventListener('input', e => {
-        if (e.target && e.target.classList.contains('counter-block-input')) {
+        if (e.target.classList.contains('counter-block-input')) {
             e.target.value = e.target.value.replace(/[\D]|^0/g, '');
         }
     });

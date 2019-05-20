@@ -1,5 +1,6 @@
 require('nodelist-foreach-polyfill');
 require('formdata-polyfill');
+require('raf');
 require('smoothscroll-polyfill');
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -23,5 +24,4 @@ window.addEventListener('DOMContentLoaded', () => {
     tabs();
     timer();
     input();
-
 });
